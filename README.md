@@ -21,7 +21,7 @@ Este repositório demonstra a diferença de desempenho entre o processamento de 
     |   |--- outputs/     # imagens desfocadas
     |--- plot_time-cpu.py    # código que gera um gráfico de comparação de desempenho
     |--- sequential_blur.py  # tempo de processamento sequencial
-    |--- threading_blur      # tempo de processamento utilizando threads  sequencial
+    |--- threading_blur      # tempo de processamento utilizando threads
 ```
 
 ## Bibliotecas Utilizadas

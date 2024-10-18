@@ -48,38 +48,42 @@ Abaixo estão gráficos que ilustram a diferença de desempenho entre as abordag
 
 #### Gráfico de Tempo de Processamento
 
-![Gráfico de Tempo de Processamento](assets/tempo_biggerDB.png)
+![Tempo](assets/tempo_biggerDB.png)
 
 #### Gráfico de Uso da CPU
 
-![Gráfico de Tempo de Processamento](assets/cpu_biggerDB.png)
+![CPU](assets/cpu_biggerDB.png)
 
 #### Gráfico de Uso de Disco
 
-![Gráfico de Tempo de Processamento](assets/disco_biggerDB.png)
+![Disco](assets/disco_biggerDB.png)
 
 #### Gráfico de Uso da Memória
 
-![Gráfico de Tempo de Processamento](assets/memoria_biggerDB.png)
+![Memória](assets/memoria_biggerDB.png)
 
 ### smaller_DB
 
 #### Gráfico de Tempo de Processamento
 
-![Gráfico de Tempo de Processamento](assets/tempo_smallerDB.png)
+![Tempo](assets/tempo_smallerDB.png)
 
 #### Gráfico de Uso da CPU
 
-![Gráfico de Tempo de Processamento](assets/cpu_smallerDB.png)
+![CPU](assets/cpu_smallerDB.png)
 
 #### Gráfico de Uso de Disco
 
-![Gráfico de Tempo de Processamento](assets/disco_smallerDB.png)
+![Disco](assets/disco_smallerDB.png)
 
 #### Gráfico de Uso da Memória
 
-![Gráfico de Tempo de Processamento](assets/memoria_smallerDB.png)
+![Memória](assets/memoria_smallerDB.png)
 
 ## Conclusão
 
-Como podemos ver nos gráficos, o uso de threads reduz significativamente o tempo de processamento. Além disso, o gráfico de uso da CPU mostra que, com threads, o uso do processador é mais eficiente, enquanto no processamento sequencial ele tende a subutilizar os recursos.
+Como podemos ver nos gráficos, o uso de multithreads reduz significativamente o tempo de processamento. Além disso, o gráfico de uso da CPU mostra que, com multithreads, o uso do processador é mais eficiente, enquanto no processamento monothread ele tende a subutilizar os recursos.
+
+Em relação ao consumo de disco, não houve variação significativa, já que tanto na abordagem monothread quanto multithreads, as operações de leitura e escrita de arquivos ocorrem de forma semelhante, sendo o gargalo principal o processamento de imagens na CPU e não o acesso ao disco.
+
+Quanto ao consumo de memória RAM, observou-se um aumento na implementação com multithreads. Isso ocorre porque, ao utilizar múltiplas threads, várias imagens são processadas simultaneamente, exigindo mais memória para armazenar dados temporários de cada thread em execução. Esse comportamento é esperado, pois cada thread pode carregar sua própria cópia de uma imagem ou parte do processamento, resultando em um uso mais intensivo de memória em comparação com a execução monothread, onde o processamento é feito uma imagem por vez.

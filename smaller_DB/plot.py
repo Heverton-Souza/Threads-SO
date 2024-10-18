@@ -12,21 +12,17 @@ def process_image(filename, input_directory, output_directory):
     output_filename = f"{os.path.splitext(filename)[0]}_blurred.jpg"
     box_blurred_image.save(os.path.join(output_directory, output_filename))
 
-# Função para processar imagens sequencialmente
-def process_images_sequentially(input_directory, output_directory):
+# Função para processar imagens usando monothread
+def process_images_monothread(input_directory, output_directory):
     start_time = time.time()
     for filename in os.listdir(input_directory):
         if filename.endswith(('.jpg', '.jpeg', '.png')):
-            original_image_path = os.path.join(input_directory, filename)
-            original_image = Image.open(original_image_path)
-            box_blurred_image = original_image.filter(ImageFilter.BoxBlur(radius=3))
-            output_filename = f"{os.path.splitext(filename)[0]}_blurred.jpg"
-            box_blurred_image.save(os.path.join(output_directory, output_filename))
+            process_image(filename, input_directory, output_directory)
     end_time = time.time()
     return end_time - start_time
 
-# Função para processar imagens com threads
-def process_images_with_threads(input_directory, output_directory):
+# Função para processar usando multithreads
+def process_images_multithreads(input_directory, output_directory):
     start_time = time.time()
     threads = []
     for filename in os.listdir(input_directory):
@@ -39,53 +35,69 @@ def process_images_with_threads(input_directory, output_directory):
     end_time = time.time()
     return end_time - start_time
 
-# Função para monitorar uso da CPU
-def monitor_cpu_usage(duration):
+# Função para monitorar recursos do sistema
+def monitor_system_usage(duration):
     cpu_usage = []
+    memory_usage = []
+    disk_usage = []
     start_time = time.time()
     while time.time() - start_time < duration:
         cpu_usage.append(psutil.cpu_percent(interval=0.5))
-    return cpu_usage
+        memory_usage.append(psutil.virtual_memory().percent)
+        disk_usage.append(psutil.disk_usage('/').percent)
+    return cpu_usage, memory_usage, disk_usage
 
-# Cria o diretório de saída, se não existir
+# Caminhos de entrada e saída
 output_directory = 'smaller_DB/images/outputs'
+input_directory = 'smaller_DB/images/inputs'
 os.makedirs(output_directory, exist_ok=True)
 
-# Caminho do diretório de entrada
-input_directory = 'smaller_DB/images/inputs'
+# Monitoramento e processamento usando monothread
+cpu_usage_mono, memory_usage_mono, disk_usage_mono = monitor_system_usage(5)
+monothread_time = process_images_monothread(input_directory, output_directory)
 
-# Executa os processamentos e monitora a CPU
-# Para processamento sequencial
-start_cpu_monitor = time.time()
-cpu_usage_sequential = monitor_cpu_usage(5)  # Monitora durante 5 segundos
-sequential_time = process_images_sequentially(input_directory, output_directory)
-end_cpu_monitor = time.time()
+# Monitoramento e processamento usando multithreads
+cpu_usage_multi, memory_usage_multi, disk_usage_multi = monitor_system_usage(5)
+multithreads_time = process_images_multithreads(input_directory, output_directory)
 
-# Para processamento com threads
-start_cpu_monitor = time.time()
-cpu_usage_threaded = monitor_cpu_usage(5)  # Monitora durante 5 segundos
-threaded_time = process_images_with_threads(input_directory, output_directory)
-end_cpu_monitor = time.time()
+# Comparação de tempo
+methods = ['Monothread', 'Multithreads']
+times = [monothread_time, multithreads_time]
 
-# Plotando os resultados de tempo de processamento
-methods = ['Sequencial', 'Threads']
-times = [sequential_time, threaded_time]
-
-plt.figure(figsize=(12, 5))
+# Gráficos
+plt.figure(figsize=(15, 10))
 
 # Gráfico de Tempo de Processamento
-plt.subplot(1, 2, 1)
+plt.subplot(2, 2, 1)
 plt.bar(methods, times, color=['blue', 'orange'])
 plt.ylabel('Tempo de Processamento (segundos)')
-plt.title('Comparação de Desempenho: Processamento de Imagens')
+plt.title('Comparação de Desempenho: Tempo de Processamento')
 plt.grid(axis='y')
 
 # Gráfico de Utilização da CPU
-plt.subplot(1, 2, 2)
-plt.plot(cpu_usage_sequential, label='Sequencial', color='blue')
-plt.plot(cpu_usage_threaded, label='Threads', color='orange')
+plt.subplot(2, 2, 2)
+plt.plot(cpu_usage_mono, label='Monothread', color='blue')
+plt.plot(cpu_usage_multi, label='Multithreads', color='orange')
 plt.ylabel('Uso da CPU (%)')
-plt.title('Utilização da CPU durante o Processamento')
+plt.title('Utilização da CPU')
+plt.legend()
+plt.grid()
+
+# Gráfico de Utilização da Memória
+plt.subplot(2, 2, 3)
+plt.plot(memory_usage_mono, label='Monothread', color='blue')
+plt.plot(memory_usage_multi, label='Multithreads', color='orange')
+plt.ylabel('Uso da Memória (%)')
+plt.title('Utilização da Memória')
+plt.legend()
+plt.grid()
+
+# Gráfico de Utilização do Disco
+plt.subplot(2, 2, 4)
+plt.plot(disk_usage_mono, label='Monothread', color='blue')
+plt.plot(disk_usage_multi, label='Multithreads', color='orange')
+plt.ylabel('Uso do Disco (%)')
+plt.title('Utilização do Disco')
 plt.legend()
 plt.grid()
 
